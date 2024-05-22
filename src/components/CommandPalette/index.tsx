@@ -98,6 +98,16 @@ export default function CommandPalette() {
       enableActivateView();
     }
 
+    // To activate issue creation using shortcut (Alt + Shift + C)
+    if (
+      issuesState?.userAction !== "activateIssue" &&
+      keyPressed?.key === "A" &&
+      keyPressed?.altKey &&
+      keyPressed?.shiftKey
+    ) {
+      handleActivateIssueCreation();
+    }
+
     // To create issue
     if (
       issuesState?.userAction === "createIssue" &&
@@ -136,6 +146,7 @@ export default function CommandPalette() {
       onKeyDown={handleCommand}
     >
       <CommandInput
+        autoFocus={true}
         placeholder={
           issuesState?.userAction === "createIssue"
             ? "Title for your issue"

@@ -30,6 +30,15 @@
     }
   });
 
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (isVisible) {
+        isVisible = false;
+        app.style.visibility = "hidden";
+      }
+    }
+  });
+
   root.appendChild(app);
 
   const src = chrome?.runtime?.getURL("/react/index.js");
