@@ -15,6 +15,38 @@ export const getIssuesById = (issues: Issue[]): IssuesById => {
   return issuesById;
 }
 
+export const deactivateOtherIssues = (issueId: string, issues: Issue[], issuesById: IssuesById) => {
+  // Update the issues in the Map
+  issuesById.forEach((issue, id) => {
+    if (id !== issueId) {
+      issue.is_active = false;
+    }
+  });
+
+  // Update the issues in the array
+  issues.forEach(issue => {
+    if (issue.id !== issueId) {
+      issue.is_active = false;
+    }
+  });
+}
+
+export const undoDeactivateIssues = (issueId: string, issues: Issue[], issuesById: IssuesById) => {
+  // Update the issues in the Map
+  issuesById.forEach((issue, id) => {
+    if (id === issueId) {
+      issue.is_active = false;
+    }
+  });
+
+  // Update the issues in the array
+  issues.forEach(issue => {
+    if (issue.id === issueId) {
+      issue.is_active = false;
+    }
+  });
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
