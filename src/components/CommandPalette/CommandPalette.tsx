@@ -17,20 +17,26 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-  Kbd,
-} from "@repo/ui";
+} from "@/components/ui/command";
+import Kbd from "../Kbd";
 
-import useIssueContext from "../../contexts/issueContext.hook";
+import useIssueContext from "@/contexts/issues/issueContext.hook";
 import Issue from "../IssueDetails/IssueDetails";
+import { fetchIssues } from "@/api/issues";
+import atypes from "@/contexts/actionTypes";
+import { populateAllIssues } from "@/contexts/issues/issueContext.actions";
+import type { Issue as IssueType } from "@/types/models";
 
-interface ICommandPalette {
-  storage: any;
-}
-
-export default function CommandPalette({ storage }: ICommandPalette) {
-  // eslint-disable-next-line no-alert
-  alert(JSON.stringify(storage));
+export default function CommandPalette() {
+  const [issues, setIssues] = useState<{ id: string; title: string }[]>([]);
   const { issuesState, issuesDispatch } = useIssueContext();
+
+  useEffect(() => {
+    // Populate issues from backend
+    fetchIssues().then((response) => {
+      issuesDispatch(populateAllIssues(response.data || []));
+    });
+  }, []);
 
   const [value, setValue] = useState<string>("");
 
@@ -42,19 +48,19 @@ export default function CommandPalette({ storage }: ICommandPalette) {
   };
 
   const handleIssueSelection = (issueId: string) => {
-    issuesDispatch({ type: "SELECT_ISSUE", payload: issueId });
+    issuesDispatch({ type: atypes.SELECT_ISSUE, payload: issueId });
     setValue("");
     setKeyPressed(undefined);
   };
 
   const handleClearIssueSelection = useCallback(() => {
-    issuesDispatch({ type: "CLEAR_ISSUE", payload: null });
+    issuesDispatch({ type: atypes.CLEAR_ISSUE, payload: null });
     setValue("");
     setKeyPressed(undefined);
   }, [issuesDispatch]);
 
   const handleActivateIssueCreation = useCallback(() => {
-    issuesDispatch({ type: "ACTIVATE_CREATE_ISSUE", payload: null });
+    issuesDispatch({ type: atypes.ACTIVATE_CREATE_ISSUE, payload: null });
     setValue("");
     setKeyPressed(undefined);
   }, [issuesDispatch]);
@@ -62,8 +68,8 @@ export default function CommandPalette({ storage }: ICommandPalette) {
   useEffect(() => {
     // To clear issue selection and go back to search
     if (
-      (issuesState?.action === "createIssue" ||
-        issuesState?.action === "issueDetails") &&
+      (issuesState?.userAction === "createIssue" ||
+        issuesState?.userAction === "issueDetails") &&
       keyPressed?.key === "Backspace" &&
       value === ""
     ) {
@@ -72,7 +78,7 @@ export default function CommandPalette({ storage }: ICommandPalette) {
 
     // To activate issue creation using typing
     if (
-      issuesState?.action !== "createIssue" &&
+      issuesState?.userAction !== "createIssue" &&
       value === "create" &&
       keyPressed?.key === ":"
     ) {
@@ -81,7 +87,7 @@ export default function CommandPalette({ storage }: ICommandPalette) {
 
     // To activate issue creation using shortcut (Alt + Shift + C)
     if (
-      issuesState?.action !== "createIssue" &&
+      issuesState?.userAction !== "createIssue" &&
       keyPressed?.key === "C" &&
       keyPressed?.altKey &&
       keyPressed?.shiftKey
@@ -91,18 +97,18 @@ export default function CommandPalette({ storage }: ICommandPalette) {
 
     // To create issue
     if (
-      issuesState?.action === "createIssue" &&
+      issuesState?.userAction === "createIssue" &&
       keyPressed?.key === "Enter" &&
       value !== ""
     ) {
-      issuesDispatch({ type: "CREATE_ISSUE", payload: value });
+      issuesDispatch({ type: atypes.CREATE_ISSUE, payload: value });
 
       handleClearIssueSelection();
     } else {
       setKeyPressed(undefined);
     }
   }, [
-    issuesState?.action,
+    issuesState?.userAction,
     value,
     keyPressed,
     issuesDispatch,
@@ -117,31 +123,35 @@ export default function CommandPalette({ storage }: ICommandPalette) {
     >
       <CommandInput
         placeholder={
-          issuesState?.action === "createIssue"
+          issuesState?.userAction === "createIssue"
             ? "Title for your issue"
-            : issuesState?.action === "issueDetails"
+            : issuesState?.userAction === "issueDetails"
               ? "Press backspace to go back or search resource links"
               : "Type a command or search..."
         }
         icon={
-          issuesState?.action === "issueDetails"
+          issuesState?.userAction === "issueDetails"
             ? ArrowLeft
-            : issuesState?.action === "createIssue"
+            : issuesState?.userAction === "createIssue"
               ? FilePlus
               : undefined
         }
         onIconClick={handleClearIssueSelection}
         value={value}
-        onValueChange={(searchValue) => setValue(searchValue)}
-        command={issuesState?.action === "createIssue" ? "create" : undefined}
+        onValueChange={(searchValue) => {
+          setValue(searchValue);
+        }}
+        command={
+          issuesState?.userAction === "createIssue" ? "create" : undefined
+        }
       />
 
-      {issuesState?.action === "searchIssue" ? (
+      {issuesState?.userAction === "searchIssue" ? (
         <CommandList className="max-h-max">
           <CommandEmpty>No results found.</CommandEmpty>
 
           <CommandGroup heading="Issues">
-            {issuesState?.issues?.map((issue) => (
+            {issuesState.issues.map((issue: IssueType) => (
               <CommandItem
                 key={issue.id}
                 onSelect={() => handleIssueSelection(issue.id)}
@@ -182,7 +192,7 @@ export default function CommandPalette({ storage }: ICommandPalette) {
 
           <CommandSeparator />
         </CommandList>
-      ) : issuesState?.action === "createIssue" ? (
+      ) : issuesState?.userAction === "createIssue" ? (
         <CommandList className="max-h-max">
           <CommandEmpty>You are creating an issue</CommandEmpty>
         </CommandList>

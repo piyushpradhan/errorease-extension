@@ -20,7 +20,6 @@
 
   window.addEventListener("keypress", (e) => {
     if (e.ctrlKey && e.shiftKey && e.key === "E") {
-      console.log(app);
       if (!isVisible) {
         app.style.visibility = "visible";
         isVisible = true;
