@@ -9,7 +9,7 @@ import App from "./App";
 import "./index.css";
 
 chrome.storage.local
-  .get(["authToken", "something", "authCode"])
+  .get(["authToken", "urlList", "authCode"])
   .then((result) => {
     ReactDOM.render(
       <React.StrictMode>
