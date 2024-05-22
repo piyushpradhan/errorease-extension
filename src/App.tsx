@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import CommandPalette from "@/components/CommandPalette/CommandPalette";
+import CommandPalette from "@/components/CommandPalette";
 import { BACKEND_URL } from "@/lib/utils";
 
 interface IApp {
@@ -11,7 +11,7 @@ export default function App({ storage }: IApp) {
   const parsedStorage = JSON.parse(JSON.stringify(storage));
   const [cookies, setCookies] = useState<string>(parsedStorage["authCode"]);
 
-  axios.interceptors.request.use(function (config) {
+  axios.interceptors.request.use(function(config) {
     config.headers.Authorization = `Bearer ${cookies}`;
     return config;
   });

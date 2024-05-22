@@ -1,0 +1,78 @@
+import { FileText, FilePlus, CreditCard, Settings } from "lucide-react";
+import {
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "@/components/ui/command";
+import Kbd from "../Kbd";
+import useIssueContext from "@/contexts/issues/issueContext.hook";
+import { Issue } from "@/types/models";
+
+interface ISearchView {
+  handleIssueSelection: (issueId: string) => void;
+  handleActivateIssueCreation: () => void;
+}
+
+const SearchView = ({ handleIssueSelection, handleActivateIssueCreation }: ISearchView) => {
+  const { issuesState } = useIssueContext();
+
+  return (
+    <CommandList className="max-h-max">
+      <CommandEmpty>No results found.</CommandEmpty>
+
+      <CommandGroup heading="Issues">
+        {issuesState.issues.map((issue: Issue) => (
+          <CommandItem
+            className={
+              issue.is_active
+                ? "border border-green-500 border-opacity-50"
+                : ""
+            }
+            key={issue.id}
+            onSelect={() => {
+              handleIssueSelection(issue.id);
+            }}
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            <span>{issue.title}</span>
+          </CommandItem>
+        ))}
+      </CommandGroup>
+
+      <CommandSeparator />
+
+      <CommandGroup heading="Actions / Commands">
+        <CommandItem onSelect={handleActivateIssueCreation}>
+          <FilePlus className="mr-2 h-4 w-4" />
+          <span>Create issue</span>
+          <CommandShortcut>
+            <Kbd text="Alt" /> + <Kbd text="⇧" /> + <Kbd text="C" />
+          </CommandShortcut>
+        </CommandItem>
+
+        <CommandItem>
+          <CreditCard className="mr-2 h-4 w-4" />
+          <span>Activate issue</span>
+          <CommandShortcut>
+            <Kbd text="Alt" /> + <Kbd text="⇧" /> + <Kbd text="A" />
+          </CommandShortcut>
+        </CommandItem>
+
+        <CommandItem>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Add resource link</span>
+          <CommandShortcut>
+            <Kbd text="Alt" /> + <Kbd text="⇧" /> + <Kbd text="R" />
+          </CommandShortcut>
+        </CommandItem>
+      </CommandGroup>
+
+      <CommandSeparator />
+    </CommandList>
+  )
+}
+
+export default SearchView;
