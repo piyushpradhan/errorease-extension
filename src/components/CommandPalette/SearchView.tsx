@@ -10,13 +10,17 @@ import {
 import Kbd from "../Kbd";
 import useIssueContext from "@/contexts/issues/issueContext.hook";
 import { Issue } from "@/types/models";
+import IssueItem from "./IssueItem";
 
 interface ISearchView {
   handleIssueSelection: (issueId: string) => void;
   handleActivateIssueCreation: () => void;
 }
 
-const SearchView = ({ handleIssueSelection, handleActivateIssueCreation }: ISearchView) => {
+const SearchView = ({
+  handleIssueSelection,
+  handleActivateIssueCreation,
+}: ISearchView) => {
   const { issuesState } = useIssueContext();
 
   return (
@@ -25,20 +29,12 @@ const SearchView = ({ handleIssueSelection, handleActivateIssueCreation }: ISear
 
       <CommandGroup heading="Issues">
         {issuesState.issues.map((issue: Issue) => (
-          <CommandItem
-            className={
-              issue.is_active
-                ? "border border-green-500 border-opacity-50"
-                : ""
-            }
-            key={issue.id}
-            onSelect={() => {
+          <IssueItem
+            issue={issue}
+            handleSelect={() => {
               handleIssueSelection(issue.id);
             }}
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            <span>{issue.title}</span>
-          </CommandItem>
+          />
         ))}
       </CommandGroup>
 
@@ -72,7 +68,7 @@ const SearchView = ({ handleIssueSelection, handleActivateIssueCreation }: ISear
 
       <CommandSeparator />
     </CommandList>
-  )
-}
+  );
+};
 
 export default SearchView;

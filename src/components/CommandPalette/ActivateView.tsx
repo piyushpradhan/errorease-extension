@@ -6,7 +6,6 @@ import {
   CommandGroup,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from "@/components/ui/command";
 import { Issue } from "@/types/models";
 import {
@@ -18,6 +17,7 @@ import {
   activateIssue as activateIssueApi,
   deactivateIssue as deactivateIssueApi,
 } from "@/api/issues";
+import IssueItem from "./IssueItem";
 
 const ActivateView = () => {
   const { issuesState, issuesDispatch } = useIssueContext();
@@ -56,22 +56,14 @@ const ActivateView = () => {
     <CommandList className="max-h-max">
       <CommandEmpty>No issues found.</CommandEmpty>
 
-      <CommandGroup heading="Issues">
+      <CommandGroup heading="Activate/Deactivate issue">
         {issuesState.issues.map((issue: Issue) => (
-          <CommandItem
-            className={
-              issue.is_active
-                ? "border border-green-500 border-opacity-50"
-                : ""
-            }
-            key={issue.id}
-            onSelect={() => {
+          <IssueItem
+            issue={issue}
+            handleSelect={() => {
               handleActivationToggle(issue.id);
             }}
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            <span>{issue.title}</span>
-          </CommandItem>
+          />
         ))}
       </CommandGroup>
     </CommandList>
