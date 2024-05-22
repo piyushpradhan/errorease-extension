@@ -26,4 +26,12 @@ export type Issue = {
   seqNo: number;
   status: "Closed" | "Open";
   labels: Pick<Label, "name" | "id">[];
+  links: Link[];
+};
+
+export type Link = {
+  id: string;
+  note?: string | null;
+  url: string;
+  issue: Issue;
 };

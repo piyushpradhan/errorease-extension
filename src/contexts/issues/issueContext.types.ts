@@ -2,9 +2,12 @@ import { Dispatch } from "react";
 import { Issue } from "@/types/models";
 import atypes from "@/contexts/actionTypes";
 
+export type IssuesById = Map<string, Issue>;
+
 export type IIssueContextState = {
   userAction: "searchIssue" | "createIssue" | "issueDetails";
   issues: Issue[];
+  issuesById: IssuesById;
   selectedIssue: string;
 };
 
