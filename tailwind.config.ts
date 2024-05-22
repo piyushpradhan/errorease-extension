@@ -1,10 +1,7 @@
 import type { Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 
-import sharedConfig from "@repo/tailwind-config";
-
 const config = {
-  presets: [sharedConfig],
   darkMode: ["class"],
   content: [
     "src/**/*.{js,ts,jsx,tsx}",

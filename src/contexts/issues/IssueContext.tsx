@@ -1,17 +1,15 @@
 import { createContext, ReactNode, useMemo, useReducer } from "react";
 
-import { localIssues } from "../components/CommandPalette/commandPalette.data";
-import { IIssueContext, IIssueContextState } from "../types/issueContext.types";
-
 import { issueReducer } from "./issueContext.reducer";
+import { IssueContextType, IIssueContextState } from "./issueContext.types";
 
 const initialState: IIssueContextState = {
-  action: "searchIssue",
-  issues: localIssues,
+  userAction: "searchIssue",
+  issues: [],
   selectedIssue: "",
 };
 
-export const IssueContext = createContext<IIssueContext>({
+export const IssueContext = createContext<IssueContextType>({
   issuesState: initialState,
   issuesDispatch: () => {},
 });

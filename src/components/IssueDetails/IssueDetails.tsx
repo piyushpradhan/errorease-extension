@@ -1,13 +1,13 @@
 import { Link2 } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import {
-  Badge,
   CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@repo/ui";
+} from "@/components/ui/command";
 
 import { issueResourceLinks } from "./issueDetails.data";
 
