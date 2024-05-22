@@ -21,10 +21,10 @@ import {
 import Kbd from "../Kbd";
 
 import useIssueContext from "@/contexts/issues/issueContext.hook";
-import Issue from "../IssueDetails/IssueDetails";
+import IssueDetails from "../IssueDetails";
 import { fetchIssues } from "@/api/issues";
 import atypes from "@/contexts/actionTypes";
-import { populateAllIssues } from "@/contexts/issues/issueContext.actions";
+import { populateAllIssues, setSelectedIssue } from "@/contexts/issues/issueContext.actions";
 import type { Issue as IssueType } from "@/types/models";
 
 export default function CommandPalette() {
@@ -47,8 +47,9 @@ export default function CommandPalette() {
     setKeyPressed(event);
   };
 
+  // Set selected issue
   const handleIssueSelection = (issueId: string) => {
-    issuesDispatch({ type: atypes.SELECT_ISSUE, payload: issueId });
+    issuesDispatch(setSelectedIssue(issueId));
     setValue("");
     setKeyPressed(undefined);
   };
@@ -154,7 +155,9 @@ export default function CommandPalette() {
             {issuesState.issues.map((issue: IssueType) => (
               <CommandItem
                 key={issue.id}
-                onSelect={() => handleIssueSelection(issue.id)}
+                onSelect={() => {
+                  handleIssueSelection(issue.id);
+                }}
               >
                 <FileText className="mr-2 h-4 w-4" />
                 <span>{issue.title}</span>
@@ -197,7 +200,7 @@ export default function CommandPalette() {
           <CommandEmpty>You are creating an issue</CommandEmpty>
         </CommandList>
       ) : (
-        <Issue />
+        <IssueDetails />
       )}
     </Command>
   );
