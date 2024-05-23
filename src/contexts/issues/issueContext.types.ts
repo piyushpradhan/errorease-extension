@@ -9,6 +9,7 @@ export type IIssueContextState = {
   issues: Issue[];
   issuesById: IssuesById;
   selectedIssue: string;
+  activeIssue: Issue | null;
 };
 
 type ActionTypes = typeof atypes;

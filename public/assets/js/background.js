@@ -1,23 +1,27 @@
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   chrome.tabs.get(activeInfo.tabId, function (tab) {
+    console.log({ activeInfo, tab });
     const url = tab.url;
     chrome.storage.local.get(["urlList"]).then((result) => {
       const urlList = result.urlList || [];
-      urlList.push(url);
+      if (!urlList.includes(url)) {
+        urlList.push(url);
+      }
       chrome.storage.local.set({ urlList: urlList }).then(() => {});
-    })
-  })
-})
+    });
+  });
+});
 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-  if (changeInfo.status === "complete" && tab.active) {
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+  console.log({ changeInfo, tab });
+  if (changeInfo.status === "complete") {
     const url = tab.url;
     chrome.storage.local.get(["urlList"]).then((result) => {
       const urlList = result.urlList || [];
-      urlList.push(url);
+      if (!urlList.includes(url)) {
+        urlList.push(url);
+      }
       chrome.storage.local.set({ urlList: urlList }).then(() => {});
-    })
+    });
   }
 });
-    
-    

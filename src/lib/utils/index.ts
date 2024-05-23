@@ -6,16 +6,26 @@ import { twMerge } from "tailwind-merge";
 // TODO: Change this to the hosted backend url
 export const BACKEND_URL = "http://localhost:3000";
 
-export const getIssuesById = (issues: Issue[]): IssuesById => {
+export const getIssuesById = (
+  issues: Issue[],
+): { issuesById: IssuesById; activeIssue: Issue | null } => {
   const issuesById = new Map<string, Issue>();
-  issues.map(issue => {
+  let activeIssue = null;
+  issues.map((issue) => {
+    if (issue.is_active) {
+      activeIssue = issue;
+    }
     issuesById.set(issue.id, issue);
   });
 
-  return issuesById;
-}
+  return { issuesById, activeIssue };
+};
 
-export const deactivateOtherIssues = (issueId: string, issues: Issue[], issuesById: IssuesById) => {
+export const deactivateOtherIssues = (
+  issueId: string,
+  issues: Issue[],
+  issuesById: IssuesById,
+) => {
   // Update the issues in the Map
   issuesById.forEach((issue, id) => {
     if (id !== issueId) {
@@ -24,14 +34,18 @@ export const deactivateOtherIssues = (issueId: string, issues: Issue[], issuesBy
   });
 
   // Update the issues in the array
-  issues.forEach(issue => {
+  issues.forEach((issue) => {
     if (issue.id !== issueId) {
       issue.is_active = false;
     }
   });
-}
+};
 
-export const undoDeactivateIssues = (issueId: string, issues: Issue[], issuesById: IssuesById) => {
+export const undoDeactivateIssues = (
+  issueId: string,
+  issues: Issue[],
+  issuesById: IssuesById,
+) => {
   // Update the issues in the Map
   issuesById.forEach((issue, id) => {
     if (id === issueId) {
@@ -40,12 +54,12 @@ export const undoDeactivateIssues = (issueId: string, issues: Issue[], issuesByI
   });
 
   // Update the issues in the array
-  issues.forEach(issue => {
+  issues.forEach((issue) => {
     if (issue.id === issueId) {
       issue.is_active = false;
     }
   });
-}
+};
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

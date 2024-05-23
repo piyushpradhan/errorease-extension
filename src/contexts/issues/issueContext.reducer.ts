@@ -1,7 +1,8 @@
 import atypes from "@/contexts/actionTypes";
 import { IIssueContextState, IssueReducerActions } from "./issueContext.types";
 import { deactivateOtherIssues, getIssuesById } from "@/lib/utils";
-import { Issue } from "@/types/models";
+import { Issue, Link } from "@/types/models";
+import * as R from "ramda";
 
 export const issueReducer = (
   state: IIssueContextState,
@@ -28,6 +29,7 @@ export const issueReducer = (
           ...state,
           issues: updatedIssues,
           issuesById: updatedIssuesById,
+          activeIssue: null,
         };
       }
       return state;
@@ -45,7 +47,7 @@ export const issueReducer = (
         const updatedIssuesById = state.issuesById;
         updatedIssuesById.set(payload, activatedIssue);
 
-        // Deactivate the other issues so that there's only one 
+        // Deactivate the other issues so that there's only one
         // active issue at a time
         deactivateOtherIssues(payload, updatedIssues, updatedIssuesById);
 
@@ -53,16 +55,21 @@ export const issueReducer = (
           ...state,
           issues: updatedIssues,
           issuesById: updatedIssuesById,
+          activeIssue: {
+            ...activatedIssue,
+            is_active: true,
+          },
         };
       }
       return state;
     case atypes.GET_ALL_ISSUES:
       if (payload) {
-        const issuesById = getIssuesById(payload);
+        const { issuesById, activeIssue } = getIssuesById(payload);
         return {
           ...state,
           issues: payload,
           issuesById,
+          activeIssue,
         };
       }
       return state;
@@ -92,6 +99,69 @@ export const issueReducer = (
       };
     case atypes.UNDO_ACTION:
       return payload;
+    case atypes.OPTIMISTICALLY_UPDATE_RES_LINKS:
+      const links: string[] = payload;
+      if (state.activeIssue) {
+        const updatedIssue = state.activeIssue;
+
+        const formattedLinks = (links ?? []).map((link, index) => ({
+          id: `temp-${index}`,
+          url: link,
+          issue: state.activeIssue,
+        }));
+
+        const updatedLinks: Link[] = [...(state.activeIssue?.links || [])];
+
+        const existingLinkUrls = (state.activeIssue?.links || []).map(
+          (link) => link.url,
+        );
+
+        formattedLinks.forEach((link) => {
+          if (!existingLinkUrls.includes(link.url)) {
+            // @ts-ignore - state.activeIssue can't be null here
+            updatedLinks.push(link);
+          }
+        });
+
+        updatedIssue.links = R.uniq(updatedLinks);
+
+        const updatedIssuesById = state.issuesById;
+        updatedIssuesById.set(state.activeIssue.id, updatedIssue);
+        console.log({ updatedIssuesById });
+
+        const updatedIssues = state.issues;
+        console.log({ updatedIssues });
+        updatedIssues.map((issue) => {
+          if (issue.id === state.activeIssue?.id) {
+            return updatedIssue;
+          }
+          return issue;
+        });
+
+        return {
+          ...state,
+          activeIssue: updatedIssue,
+          issuesById: updatedIssuesById,
+          issues: updatedIssues,
+        };
+      }
+      return state;
+    case atypes.UPDATE_RES_LINKS:
+      const updatedIssue = payload as Issue;
+      const updatedIssuesById = state.issuesById;
+      const updatedIssues = state.issues.map((issue) => {
+        if (issue.id === payload.id) {
+          return payload;
+        }
+        return issue;
+      });
+      updatedIssuesById.set(payload.id, payload);
+      return {
+        ...state,
+        issues: updatedIssues,
+        issuesById: updatedIssuesById,
+        activeIssue: payload,
+      };
     default:
       return state;
   }
