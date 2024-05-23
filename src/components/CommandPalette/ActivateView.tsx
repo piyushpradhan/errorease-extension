@@ -28,6 +28,7 @@ const ActivateView = () => {
     issuesDispatch(activateIssue(issueId));
     try {
       await activateIssueApi(issueId);
+      await chrome.storage.local.remove("urlList");
     } catch (error) {
       issuesDispatch(undoAction(beforeUpdate));
     }
@@ -39,6 +40,7 @@ const ActivateView = () => {
     issuesDispatch(deactivateIssue(issueId));
     try {
       await deactivateIssueApi(issueId);
+      await chrome.storage.local.remove("urlList");
     } catch (error) {
       issuesDispatch(undoAction(beforeUpdate));
     }

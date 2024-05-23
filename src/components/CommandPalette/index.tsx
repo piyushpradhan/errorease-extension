@@ -64,7 +64,8 @@ export default function CommandPalette() {
     // To clear issue selection and go back to search
     if (
       (issuesState?.userAction === "createIssue" ||
-        issuesState?.userAction === "issueDetails" || issuesState?.userAction === "activateIssue") &&
+        issuesState?.userAction === "issueDetails" ||
+        issuesState?.userAction === "activateIssue") &&
       keyPressed?.key === "Backspace" &&
       value === ""
     ) {
@@ -105,7 +106,7 @@ export default function CommandPalette() {
       keyPressed?.altKey &&
       keyPressed?.shiftKey
     ) {
-      handleActivateIssueCreation();
+      enableActivateView();
     }
 
     // To create issue

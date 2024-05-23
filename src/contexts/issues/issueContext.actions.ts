@@ -37,7 +37,23 @@ export const clearIssue = (): IssueReducerActions => ({
   payload: {},
 });
 
-export const undoAction = (payload: IIssueContextState): IssueReducerActions => ({
+export const undoAction = (
+  payload: IIssueContextState,
+): IssueReducerActions => ({
   type: atypes.UNDO_ACTION,
-  payload
+  payload,
+});
+
+export const setUpdatedResourceLinks = (
+  payload: Issue,
+): IssueReducerActions => ({
+  type: atypes.UPDATE_RES_LINKS,
+  payload,
+});
+
+export const optimisticallyUpdateResourceLinks = (
+  payload: string[],
+): IssueReducerActions => ({
+  type: atypes.OPTIMISTICALLY_UPDATE_RES_LINKS,
+  payload,
 });
