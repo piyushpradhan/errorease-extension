@@ -127,10 +127,8 @@ export const issueReducer = (
 
         const updatedIssuesById = state.issuesById;
         updatedIssuesById.set(state.activeIssue.id, updatedIssue);
-        console.log({ updatedIssuesById });
 
         const updatedIssues = state.issues;
-        console.log({ updatedIssues });
         updatedIssues.map((issue) => {
           if (issue.id === state.activeIssue?.id) {
             return updatedIssue;
