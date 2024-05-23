@@ -21,7 +21,9 @@ export default function App({ storage }: IApp) {
 
   const { issuesState, issuesDispatch } = useIssueContext();
 
-  axios.interceptors.request.use(function (config) {
+  const activeIssueId = issuesState.activeIssue?.id || null;
+
+  axios.interceptors.request.use(function(config) {
     config.headers.Authorization = `Bearer ${cookies}`;
     return config;
   });
@@ -48,8 +50,8 @@ export default function App({ storage }: IApp) {
       }
     };
 
-    updateResourceLinks().then(() => {});
-  }, [JSON.stringify(resourceLinks), issuesState.activeIssue]);
+    updateResourceLinks().then(() => { });
+  }, [JSON.stringify(resourceLinks), activeIssueId]);
 
   function openGithubLoginPopup() {
     const popupUrl = `${BACKEND_URL}/api/auth/github`;
