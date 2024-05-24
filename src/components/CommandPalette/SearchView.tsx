@@ -1,4 +1,4 @@
-import { FileText, FilePlus, CreditCard, Settings } from "lucide-react";
+import { FilePlus, CreditCard, Settings } from "lucide-react";
 import {
   CommandEmpty,
   CommandGroup,
@@ -15,11 +15,13 @@ import IssueItem from "./IssueItem";
 interface ISearchView {
   handleIssueSelection: (issueId: string) => void;
   handleActivateIssueCreation: () => void;
+  enableActivateView: () => void;
 }
 
 const SearchView = ({
   handleIssueSelection,
   handleActivateIssueCreation,
+  enableActivateView,
 }: ISearchView) => {
   const { issuesState } = useIssueContext();
 
@@ -49,7 +51,7 @@ const SearchView = ({
           </CommandShortcut>
         </CommandItem>
 
-        <CommandItem>
+        <CommandItem onSelect={enableActivateView}>
           <CreditCard className="mr-2 h-4 w-4" />
           <span>Activate issue</span>
           <CommandShortcut>
@@ -57,13 +59,13 @@ const SearchView = ({
           </CommandShortcut>
         </CommandItem>
 
-        <CommandItem>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Add resource link</span>
-          <CommandShortcut>
-            <Kbd text="Alt" /> + <Kbd text="⇧" /> + <Kbd text="R" />
-          </CommandShortcut>
-        </CommandItem>
+        {/* <CommandItem> */}
+        {/*   <Settings className="mr-2 h-4 w-4" /> */}
+        {/*   <span>Add resource link</span> */}
+        {/*   <CommandShortcut> */}
+        {/*     <Kbd text="Alt" /> + <Kbd text="⇧" /> + <Kbd text="R" /> */}
+        {/*   </CommandShortcut> */}
+        {/* </CommandItem> */}
       </CommandGroup>
 
       <CommandSeparator />

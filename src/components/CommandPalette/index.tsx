@@ -5,14 +5,17 @@ import { ArrowLeft, FilePlus } from "lucide-react";
 import { Command, CommandInput } from "@/components/ui/command";
 
 import useIssueContext from "@/contexts/issues/issueContext.hook";
-import { fetchIssues } from "@/api/issues";
+import { createIssue, fetchIssues } from "@/api/issues";
 import atypes from "@/contexts/actionTypes";
 import {
   activateCreateView,
   activateIssueView,
   clearIssue,
+  optimisticallyCreateIssue,
   populateAllIssues,
   setSelectedIssue,
+  undoAction,
+  updateCreatedIssue,
 } from "@/contexts/issues/issueContext.actions";
 import CommandView from "./CommandView";
 
@@ -108,19 +111,6 @@ export default function CommandPalette() {
     ) {
       enableActivateView();
     }
-
-    // To create issue
-    if (
-      issuesState?.userAction === "createIssue" &&
-      keyPressed?.key === "Enter" &&
-      value !== ""
-    ) {
-      issuesDispatch({ type: atypes.CREATE_ISSUE, payload: value });
-
-      handleClearIssueSelection();
-    } else {
-      setKeyPressed(undefined);
-    }
   }, [
     issuesState?.userAction,
     value,
@@ -129,6 +119,23 @@ export default function CommandPalette() {
     handleClearIssueSelection,
     handleActivateIssueCreation,
   ]);
+
+  const handleSubmit = async (event: KeyboardEvent) => {
+    if (issuesState.userAction === "createIssue" && event.key === "Enter") {
+      const beforeCreation = issuesState;
+      issuesDispatch(optimisticallyCreateIssue(value));
+      try {
+        const response = await createIssue(value);
+        issuesDispatch(updateCreatedIssue(response.data));
+      } catch (err) {
+        console.error(err);
+        issuesDispatch(undoAction(beforeCreation));
+      } finally {
+        setValue("");
+        setKeyPressed(undefined);
+      }
+    }
+  };
 
   const getCommand = () => {
     switch (issuesState.userAction) {
@@ -167,12 +174,14 @@ export default function CommandPalette() {
         onValueChange={(searchValue) => {
           setValue(searchValue);
         }}
+        onKeyDown={handleSubmit}
         command={getCommand()}
       />
 
       <CommandView
         handleIssueSelection={handleIssueSelection}
         handleActivateIssueCreation={handleActivateIssueCreation}
+        enableActivateView={enableActivateView}
       />
     </Command>
   );

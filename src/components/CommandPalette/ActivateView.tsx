@@ -1,10 +1,8 @@
 import useIssueContext from "@/contexts/issues/issueContext.hook";
 
-import { FileText } from "lucide-react";
 import {
   CommandEmpty,
   CommandGroup,
-  CommandItem,
   CommandList,
 } from "@/components/ui/command";
 import { Issue } from "@/types/models";

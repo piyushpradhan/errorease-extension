@@ -57,3 +57,15 @@ export const optimisticallyUpdateResourceLinks = (
   type: atypes.OPTIMISTICALLY_UPDATE_RES_LINKS,
   payload,
 });
+
+export const optimisticallyCreateIssue = (
+  payload: string,
+): IssueReducerActions => ({
+  type: atypes.OPTIMISTICALLY_CREATE_ISSUE,
+  payload,
+});
+
+export const updateCreatedIssue = (payload: Issue): IssueReducerActions => ({
+  type: atypes.UPDATE_CREATED_ISSUE,
+  payload,
+});

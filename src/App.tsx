@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Github, GithubIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import CommandPalette from "@/components/CommandPalette";
 import { BACKEND_URL } from "@/lib/utils";
 import useIssueContext from "./contexts/issues/issueContext.hook";
@@ -55,6 +57,7 @@ export default function App({ storage }: IApp) {
     updateResourceLinks().then(() => { });
   }, [JSON.stringify(resourceLinks), activeIssueId]);
 
+
   function openGithubLoginPopup() {
     const popupUrl = `${BACKEND_URL}/api/auth/github`;
     const popupWindow = window.open(popupUrl, "_blank", "width=600,height=800");
@@ -69,15 +72,17 @@ export default function App({ storage }: IApp) {
     });
   }
 
+  const handleSignInWithPopup = () => {
+    openGithubLoginPopup();
+  }
+
   if (!cookies || cookies?.length === 0) {
     return (
-      <button
-        onClick={() => {
-          openGithubLoginPopup();
-        }}
-      >
-        Sign in with GitHub
-      </button>
+      <div className="w-full h-screen flex justify-center items-center">
+        <Button onClick={handleSignInWithPopup}>
+          <GithubIcon className="mr-2 h-4 w-4" /> Login with Github
+        </Button>
+      </div>
     );
   }
 

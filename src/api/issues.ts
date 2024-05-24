@@ -21,3 +21,10 @@ export async function deactivateIssue(issueId: string) {
   });
   return response.data;
 }
+
+export async function createIssue(title: string) {
+  const response = await axios.post(`${BACKEND_URL}/api/issues/create`, {
+    title,
+  });
+  return response.data;
+}

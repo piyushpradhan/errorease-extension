@@ -165,6 +165,47 @@ export const issueReducer = (
         issuesById: updatedIssuesById,
         activeIssue: updatedIssue,
       };
+    case atypes.OPTIMISTICALLY_CREATE_ISSUE:
+      const temporaryIssue: Issue = {
+        id: "temp-issue-id",
+        seqNo: -1,
+        title: payload,
+        is_active: false,
+        status: "Open",
+        issue_map: "",
+        created_at: Date.now().toLocaleString(),
+        updated_at: Date.now().toLocaleString(),
+        labels: [],
+        links: [],
+      };
+
+      const issuesById = state.issuesById;
+      issuesById.set("temp-issue-id", temporaryIssue);
+
+      return {
+        ...state,
+        userAction: "searchIssue",
+        issuesById,
+        issues: [...(state.issues || []), temporaryIssue],
+      };
+    case atypes.UPDATE_CREATED_ISSUE:
+      const createdIssue = payload as Issue;
+
+      const newIssuesById = state.issuesById;
+      newIssuesById.set("temp-issue-id", createdIssue);
+
+      const newIssues = state.issues.map((issue) => {
+        if (issue.id === "temp-issue-id") {
+          return createdIssue;
+        }
+        return issue;
+      });
+
+      return {
+        ...state,
+        issuesById: newIssuesById,
+        issues: newIssues,
+      };
     default:
       return state;
   }
