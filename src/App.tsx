@@ -33,15 +33,17 @@ export default function App({ storage }: IApp) {
       if (issuesState.activeIssue) {
         const { urlList } = await chrome.storage.local.get(["urlList"]);
         setResourceLinks(urlList);
-        console.log("urlList", { urlList });
         const beforeUpdate = issuesState;
         issuesDispatch(optimisticallyUpdateResourceLinks(urlList));
         try {
           // activeIssue can't be null here
-          const updatedIssue = await updateLinks(
+          const response = await updateLinks(
             issuesState.activeIssue?.id || "",
             urlList,
           );
+
+          const updatedIssue = response?.data;
+
           issuesDispatch(setUpdatedResourceLinks(updatedIssue));
         } catch (err) {
           console.error(err);

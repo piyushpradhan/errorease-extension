@@ -117,7 +117,11 @@ export const issueReducer = (
         );
 
         formattedLinks.forEach((link) => {
-          if (!existingLinkUrls.includes(link.url)) {
+          if (
+            !existingLinkUrls.includes(link.url) &&
+            !link.url.startsWith("chrome://") &&
+            link.url.trim().length > 0
+          ) {
             // @ts-ignore - state.activeIssue can't be null here
             updatedLinks.push(link);
           }
@@ -148,17 +152,18 @@ export const issueReducer = (
       const updatedIssue = payload as Issue;
       const updatedIssuesById = state.issuesById;
       const updatedIssues = state.issues.map((issue) => {
-        if (issue.id === payload.id) {
-          return payload;
+        if (issue.id === updatedIssue.id) {
+          return updatedIssue;
         }
         return issue;
       });
-      updatedIssuesById.set(payload.id, payload);
+      updatedIssuesById.set(updatedIssue.id, updatedIssue);
+
       return {
         ...state,
         issues: updatedIssues,
         issuesById: updatedIssuesById,
-        activeIssue: payload,
+        activeIssue: updatedIssue,
       };
     default:
       return state;
