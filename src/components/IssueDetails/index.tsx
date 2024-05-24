@@ -12,12 +12,13 @@ import {
 import useIssueContext from "@/contexts/issues/issueContext.hook";
 
 export default function IssueDetails() {
-  const { issuesState, issuesDispatch } = useIssueContext();
-  const selectedIssue = issuesState.issuesById.get(issuesState.selectedIssue);
+  const { issuesState } = useIssueContext();
+  const selectedIssueId = issuesState.selectedIssue;
+  const selectedIssueDetails = issuesState.issuesById.get(selectedIssueId);
 
-  if (!selectedIssue) {
+  if (!selectedIssueDetails) {
     // Show a better looking message
-    return <p>Couldn't fetch issue details</p>
+    return <p>Couldn't fetch issue details</p>;
   }
 
   const handleResourceLinkSelection = (url: string) => {
@@ -28,11 +29,11 @@ export default function IssueDetails() {
     <CommandList className="max-h-max">
       <CommandGroup className="p-3">
         <h3 className="mb-2 text-lg font-semibold">
-          {selectedIssue.seqNo} =&gt; {selectedIssue.title}
+          {selectedIssueDetails.seqNo} =&gt; {selectedIssueDetails.title}
         </h3>
 
         <div className="flex gap-2">
-          {selectedIssue.labels.map(label => (
+          {selectedIssueDetails.labels.map((label) => (
             <Badge
               variant="outline"
               className="cursor-pointer border border-primary bg-background text-xs"
@@ -46,7 +47,7 @@ export default function IssueDetails() {
       <CommandSeparator />
 
       <CommandGroup heading="Resource links">
-        {selectedIssue.links.map((link) => (
+        {selectedIssueDetails.links.map((link) => (
           <CommandItem
             key={link.id}
             onSelect={() => handleResourceLinkSelection(link.url)}

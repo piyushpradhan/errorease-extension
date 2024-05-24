@@ -1,8 +1,5 @@
 import useIssueContext from "@/contexts/issues/issueContext.hook";
-import {
-  CommandEmpty,
-  CommandList,
-} from "@/components/ui/command";
+import { CommandEmpty, CommandList } from "@/components/ui/command";
 import ActivateView from "./ActivateView";
 import IssueDetails from "../IssueDetails";
 import SearchView from "./SearchView";
@@ -19,7 +16,12 @@ const CommandView = ({
   const { issuesState } = useIssueContext();
   switch (issuesState.userAction) {
     case "searchIssue":
-      return <SearchView handleIssueSelection={handleIssueSelection} handleActivateIssueCreation={handleActivateIssueCreation} />
+      return (
+        <SearchView
+          handleIssueSelection={handleIssueSelection}
+          handleActivateIssueCreation={handleActivateIssueCreation}
+        />
+      );
     case "activateIssue":
       return <ActivateView />;
 
