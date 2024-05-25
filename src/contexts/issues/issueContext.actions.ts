@@ -1,6 +1,10 @@
 import { Issue } from "@/types/models";
 import atypes from "../actionTypes";
-import { IIssueContextState, IssueReducerActions } from "./issueContext.types";
+import {
+  IIssueContextState,
+  IssueReducerActions,
+  UserAction,
+} from "./issueContext.types";
 
 export const populateAllIssues = (payload: Issue[]): IssueReducerActions => ({
   type: atypes.GET_ALL_ISSUES,
@@ -67,5 +71,10 @@ export const optimisticallyCreateIssue = (
 
 export const updateCreatedIssue = (payload: Issue): IssueReducerActions => ({
   type: atypes.UPDATE_CREATED_ISSUE,
+  payload,
+});
+
+export const setUserAction = (payload: UserAction): IssueReducerActions => ({
+  type: atypes.SET_USER_ACTION,
   payload,
 });

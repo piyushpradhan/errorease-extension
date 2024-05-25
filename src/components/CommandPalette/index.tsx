@@ -14,6 +14,7 @@ import {
   optimisticallyCreateIssue,
   populateAllIssues,
   setSelectedIssue,
+  setUserAction,
   undoAction,
   updateCreatedIssue,
 } from "@/contexts/issues/issueContext.actions";
@@ -122,16 +123,17 @@ export default function CommandPalette() {
 
   const handleSubmit = async (event: KeyboardEvent) => {
     if (issuesState.userAction === "createIssue" && event.key === "Enter") {
-      const beforeCreation = issuesState;
-      issuesDispatch(optimisticallyCreateIssue(value));
+      // const beforeCreation = issuesState;
+      // issuesDispatch(optimisticallyCreateIssue(value));
       try {
         const response = await createIssue(value);
         issuesDispatch(updateCreatedIssue(response.data));
       } catch (err) {
         console.error(err);
-        issuesDispatch(undoAction(beforeCreation));
+        // issuesDispatch(undoAction(beforeCreation));
       } finally {
         setValue("");
+        issuesDispatch(setUserAction("searchIssue"));
         setKeyPressed(undefined);
       }
     }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Github, GithubIcon } from "lucide-react";
+import { Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CommandPalette from "@/components/CommandPalette";
 import { BACKEND_URL } from "@/lib/utils";
@@ -57,7 +57,6 @@ export default function App({ storage }: IApp) {
     updateResourceLinks().then(() => { });
   }, [JSON.stringify(resourceLinks), activeIssueId]);
 
-
   function openGithubLoginPopup() {
     const popupUrl = `${BACKEND_URL}/api/auth/github`;
     const popupWindow = window.open(popupUrl, "_blank", "width=600,height=800");
@@ -65,6 +64,7 @@ export default function App({ storage }: IApp) {
     window.addEventListener("message", (event) => {
       if (event.source === popupWindow) {
         chrome.storage.local.set({ authCode: event.data }).then(() => {
+          console.log("cookies", event.data);
           setCookies(event.data);
           popupWindow?.close();
         });
@@ -74,13 +74,15 @@ export default function App({ storage }: IApp) {
 
   const handleSignInWithPopup = () => {
     openGithubLoginPopup();
-  }
+  };
+
+  console.log({ cookies });
 
   if (!cookies || cookies?.length === 0) {
     return (
-      <div className="w-full h-screen flex justify-center items-center">
+      <div className="pattern-dots flex h-screen w-full items-center justify-center pattern-bg-transparent pattern-[#dadada] pattern-opacity-100 pattern-size-4">
         <Button onClick={handleSignInWithPopup}>
-          <GithubIcon className="mr-2 h-4 w-4" /> Login with Github
+          <Github className="mr-2 h-4 w-4" /> Login with Github
         </Button>
       </div>
     );

@@ -11,6 +11,11 @@ export const issueReducer = (
   const { payload, type }: IssueReducerActions = action;
 
   switch (type) {
+    case atypes.SET_USER_ACTION:
+      return {
+        ...state,
+        userAction: payload,
+      };
     case atypes.DEACTIVATE_ISSUE:
       const deactivatedIssue = state.issuesById.get(payload);
       if (payload && deactivatedIssue) {
@@ -192,14 +197,9 @@ export const issueReducer = (
       const createdIssue = payload as Issue;
 
       const newIssuesById = state.issuesById;
-      newIssuesById.set("temp-issue-id", createdIssue);
+      newIssuesById.set(createdIssue.id, createdIssue);
 
-      const newIssues = state.issues.map((issue) => {
-        if (issue.id === "temp-issue-id") {
-          return createdIssue;
-        }
-        return issue;
-      });
+      const newIssues = [...state.issues, createdIssue];
 
       return {
         ...state,

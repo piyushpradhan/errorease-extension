@@ -4,8 +4,14 @@ import atypes from "@/contexts/actionTypes";
 
 export type IssuesById = Map<string, Issue>;
 
+export type UserAction =
+  | "searchIssue"
+  | "createIssue"
+  | "issueDetails"
+  | "activateIssue";
+
 export type IIssueContextState = {
-  userAction: "searchIssue" | "createIssue" | "issueDetails" | "activateIssue";
+  userAction: UserAction;
   issues: Issue[];
   issuesById: IssuesById;
   selectedIssue: string;
