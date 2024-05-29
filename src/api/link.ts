@@ -1,8 +1,8 @@
 import { BACKEND_URL } from "@/lib/utils";
-import axios from "axios";
+import { axiosInstance } from ".";
 
 export async function updateLinks(issueId: string, links: string[]) {
-  const response = await axios.post(`${BACKEND_URL}/api/links/update`, {
+  const response = await axiosInstance.post(`${BACKEND_URL}/api/links/update`, {
     issueId,
     links,
   });

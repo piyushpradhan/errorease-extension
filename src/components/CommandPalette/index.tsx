@@ -6,29 +6,32 @@ import { Command, CommandInput } from "@/components/ui/command";
 
 import useIssueContext from "@/contexts/issues/issueContext.hook";
 import { createIssue, fetchIssues } from "@/api/issues";
-import atypes from "@/contexts/actionTypes";
 import {
   activateCreateView,
   activateIssueView,
   clearIssue,
-  optimisticallyCreateIssue,
   populateAllIssues,
   setSelectedIssue,
   setUserAction,
-  undoAction,
   updateCreatedIssue,
 } from "@/contexts/issues/issueContext.actions";
 import CommandView from "./CommandView";
 
-export default function CommandPalette() {
+interface ICommandPalette {
+  cookies: string;
+};
+
+export default function CommandPalette({ cookies }: ICommandPalette) {
   const { issuesState, issuesDispatch } = useIssueContext();
 
   useEffect(() => {
-    // Populate issues from backend
-    fetchIssues().then((response) => {
-      issuesDispatch(populateAllIssues(response.data || []));
-    });
-  }, []);
+    if (cookies?.length > 0) {
+      // Populate issues from backend
+      fetchIssues(cookies).then((response) => {
+        issuesDispatch(populateAllIssues(response.data || []));
+      });
+    }
+  }, [cookies]);
 
   const [value, setValue] = useState<string>("");
 

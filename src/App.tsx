@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CommandPalette from "@/components/CommandPalette";
@@ -10,6 +9,7 @@ import {
   setUpdatedResourceLinks,
   undoAction,
 } from "./contexts/issues/issueContext.actions";
+import { axiosInstance } from "./api";
 import { updateLinks } from "./api/link";
 
 interface IApp {
@@ -25,10 +25,16 @@ export default function App({ storage }: IApp) {
 
   const activeIssueId = issuesState.activeIssue?.id || null;
 
-  axios.interceptors.request.use(function(config) {
-    config.headers.Authorization = `Bearer ${cookies}`;
-    return config;
-  });
+  axiosInstance.interceptors.request.use(
+    (config) => {
+      config.headers.Authorization = `Bearer ${cookies}`;
+      return config;
+    },
+    (error) => {
+      console.error("axios interceptor error", error);
+      return Promise.reject(error);
+    }
+  );
 
   useEffect(() => {
     const updateResourceLinks = async () => {
@@ -58,14 +64,15 @@ export default function App({ storage }: IApp) {
   }, [JSON.stringify(resourceLinks), activeIssueId]);
 
   function openGithubLoginPopup() {
-    const popupUrl = `${BACKEND_URL}/api/auth/github`;
+    const popupUrl = `${BACKEND_URL}/api/auth/github?type=extension`;
     const popupWindow = window.open(popupUrl, "_blank", "width=600,height=800");
 
     window.addEventListener("message", (event) => {
       if (event.source === popupWindow) {
-        chrome.storage.local.set({ authCode: event.data }).then(() => {
-          console.log("cookies", event.data);
-          setCookies(event.data);
+        const { accessToken, refreshToken } = event.data;
+        const cookies = `accessToken=${accessToken};refreshToken=${refreshToken}`;
+        chrome.storage.local.set({ authCode: cookies }).then(() => {
+          setCookies(cookies);
           popupWindow?.close();
         });
       }
@@ -75,8 +82,6 @@ export default function App({ storage }: IApp) {
   const handleSignInWithPopup = () => {
     openGithubLoginPopup();
   };
-
-  console.log({ cookies });
 
   if (!cookies || cookies?.length === 0) {
     return (
@@ -88,5 +93,5 @@ export default function App({ storage }: IApp) {
     );
   }
 
-  return <CommandPalette />;
+  return <CommandPalette cookies={cookies} />;
 }
