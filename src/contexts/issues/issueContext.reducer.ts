@@ -219,6 +219,23 @@ export const issueReducer = (
         issuesById: newIssuesById,
         issues: reorderActiveIssue(newIssues),
       };
+    case atypes.REMOVE_LINK: {
+      const updatedIssueDetails = state.issuesById;
+      let updatedIssue = state.issuesById.get(payload.issueId);
+      if (updatedIssue) {
+        const updatedLinks: Link[] = (updatedIssue?.links ?? []).filter(link => link.id !== payload.linkId);
+        updatedIssue = {
+          ...updatedIssue,
+          links: [...(updatedLinks ?? [])]
+        };
+        updatedIssueDetails.set(payload.issueId, updatedIssue);
+      }
+
+      return {
+        ...state,
+        issuesById: updatedIssueDetails
+      }
+    }
     default:
       return state;
   }

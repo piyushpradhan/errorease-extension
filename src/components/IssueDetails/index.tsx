@@ -1,4 +1,5 @@
-import { Link2 } from "lucide-react";
+import { Link2, Trash } from "lucide-react";
+import { MouseEvent } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -10,9 +11,12 @@ import {
 } from "@/components/ui/command";
 
 import useIssueContext from "@/contexts/issues/issueContext.hook";
+import { Link } from "@/types/models";
+import { removeLink, undoAction } from "@/contexts/issues/issueContext.actions";
+import { removeLink as removeLinkApi } from "@/api/link";
 
 export default function IssueDetails() {
-  const { issuesState } = useIssueContext();
+  const { issuesState, issuesDispatch } = useIssueContext();
   const selectedIssueId = issuesState.selectedIssue;
   const selectedIssueDetails = issuesState.issuesById.get(selectedIssueId);
 
@@ -24,6 +28,23 @@ export default function IssueDetails() {
   const handleResourceLinkSelection = (url: string) => {
     window.open(url, "_blank");
   };
+
+  const handleRemoveLink = async (e: any, link: Link) => {
+    e.stopPropagation();
+
+    const beforeUpdate = issuesState;
+    issuesDispatch(removeLink({
+      issueId: selectedIssueId,
+      linkId: link.id
+    }));
+
+    try {
+      await removeLinkApi(selectedIssueId, link.id);
+    } catch (err) {
+      console.error(err);
+      issuesDispatch(undoAction(beforeUpdate));
+    }
+  }
 
   return (
     <CommandList className="max-h-max">
@@ -50,10 +71,16 @@ export default function IssueDetails() {
         {selectedIssueDetails.links.map((link) => (
           <CommandItem
             key={link.id}
+            className="flex flex-row justify-between group"
             onSelect={() => handleResourceLinkSelection(link.url)}
           >
-            <Link2 className="mr-2 h-4 w-4 shrink-0" />
-            <span className="line-clamp-1">{link.url}</span>
+            <div className="flex flex-row items-center overflow-hidden">
+              <Link2 className="mr-2 h-4 w-4 shrink-0" />
+              <span className="line-clamp-1">{link.url}</span>
+            </div>
+            <Trash className="h-4 w-4 shrink-0 hidden group-hover:block cursor-pointer" onClick={(e) => {
+              handleRemoveLink(e, link)
+            }} />
           </CommandItem>
         ))}
       </CommandGroup>
