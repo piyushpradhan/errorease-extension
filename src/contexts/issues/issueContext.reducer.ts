@@ -1,6 +1,6 @@
 import atypes from "@/contexts/actionTypes";
 import { IIssueContextState, IssueReducerActions } from "./issueContext.types";
-import { deactivateOtherIssues, getIssuesById } from "@/lib/utils";
+import { deactivateOtherIssues, getIssuesById, reorderActiveIssue } from "@/lib/utils";
 import { Issue, Link } from "@/types/models";
 import * as R from "ramda";
 
@@ -14,9 +14,11 @@ export const issueReducer = (
     case atypes.UPDATE_ISSUES_REALTIME:
       const { issuesById: byId, activeIssue } = getIssuesById(payload);
 
+      const reorderedIssues = reorderActiveIssue(payload || []);
+
       return {
         ...state,
-        issues: payload,
+        issues: reorderedIssues,
         issuesById: byId,
         activeIssue
       };
@@ -50,13 +52,15 @@ export const issueReducer = (
     case atypes.ACTIVATE_ISSUE:
       const activatedIssue = state.issuesById.get(payload);
       if (payload && activatedIssue) {
-        const updatedIssues = state.issues.map((issue) => {
+        let updatedIssues = state.issues.map((issue) => {
           if (issue.id === payload) {
             issue.is_active = true;
             activatedIssue.is_active = true;
           }
           return issue;
         });
+
+        updatedIssues = reorderActiveIssue(updatedIssues);
 
         const updatedIssuesById = state.issuesById;
         updatedIssuesById.set(payload, activatedIssue);
@@ -81,7 +85,7 @@ export const issueReducer = (
         const { issuesById, activeIssue } = getIssuesById(payload);
         return {
           ...state,
-          issues: payload,
+          issues: reorderActiveIssue(payload),
           issuesById,
           activeIssue,
         };
@@ -158,7 +162,7 @@ export const issueReducer = (
           ...state,
           activeIssue: updatedIssue,
           issuesById: updatedIssuesById,
-          issues: updatedIssues,
+          issues: reorderActiveIssue(updatedIssues),
         };
       }
       return state;
@@ -175,7 +179,7 @@ export const issueReducer = (
 
       return {
         ...state,
-        issues: updatedIssues,
+        issues: reorderActiveIssue(updatedIssues),
         issuesById: updatedIssuesById,
         activeIssue: updatedIssue,
       };
@@ -200,7 +204,7 @@ export const issueReducer = (
         ...state,
         userAction: "searchIssue",
         issuesById,
-        issues: [...(state.issues || []), temporaryIssue],
+        issues: reorderActiveIssue([...(state.issues || []), temporaryIssue]),
       };
     case atypes.UPDATE_CREATED_ISSUE:
       const createdIssue = payload as Issue;
@@ -213,7 +217,7 @@ export const issueReducer = (
       return {
         ...state,
         issuesById: newIssuesById,
-        issues: newIssues,
+        issues: reorderActiveIssue(newIssues),
       };
     default:
       return state;
