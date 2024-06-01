@@ -63,7 +63,9 @@ export default function App({ storage }: IApp) {
 
           const updatedIssue = response?.data;
 
-          issuesDispatch(setUpdatedResourceLinks(updatedIssue));
+          if (response?.data) {
+            issuesDispatch(setUpdatedResourceLinks(updatedIssue));
+          }
         } catch (err) {
           console.error(err);
           issuesDispatch(undoAction(beforeUpdate));
