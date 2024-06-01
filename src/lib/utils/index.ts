@@ -62,6 +62,19 @@ export const undoDeactivateIssues = (
   });
 };
 
+export const reorderActiveIssue = (issues: Issue[]) => {
+  let reordered = issues;
+  issues.forEach((issue, index) => {
+    if (issue.is_active) {
+      const temp = issues[0];
+      reordered[0] = issue;
+      reordered[index] = temp;
+    }
+  })
+
+  return reordered;
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
