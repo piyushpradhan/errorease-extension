@@ -9,3 +9,9 @@ export async function updateLinks(issueId: string, links: string[]) {
 
   return response.data;
 }
+
+export async function removeLink(issueId: string, linkId: string) {
+  const response = await axiosInstance.delete(`${BACKEND_URL}/api/links/remove?issue=${issueId}&link=${linkId}`);
+
+  return response.data;
+}
