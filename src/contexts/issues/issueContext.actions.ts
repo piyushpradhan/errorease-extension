@@ -83,3 +83,8 @@ export const updateIssuesInRealtime = (payload: Issue[]): IssueReducerActions =>
   type: atypes.UPDATE_ISSUES_REALTIME,
   payload
 });
+
+export const removeLink = (payload: { issueId: string, linkId: string }): IssueReducerActions => ({
+  type: atypes.REMOVE_LINK,
+  payload
+});
