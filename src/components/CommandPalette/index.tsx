@@ -16,19 +16,24 @@ import {
   updateCreatedIssue,
 } from "@/contexts/issues/issueContext.actions";
 import CommandView from "./CommandView";
+import { Skeleton } from "../ui/skeleton";
 
 interface ICommandPalette {
   cookies: string;
 };
 
 export default function CommandPalette({ cookies }: ICommandPalette) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { issuesState, issuesDispatch } = useIssueContext();
 
   useEffect(() => {
     if (cookies?.length > 0) {
+      setIsLoading(true);
       // Populate issues from backend
       fetchIssues(cookies).then((response) => {
         issuesDispatch(populateAllIssues(response.data || []));
+      }).finally(() => {
+        setIsLoading(false);
       });
     }
   }, [cookies]);
@@ -183,11 +188,19 @@ export default function CommandPalette({ cookies }: ICommandPalette) {
         command={getCommand()}
       />
 
-      <CommandView
-        handleIssueSelection={handleIssueSelection}
-        handleActivateIssueCreation={handleActivateIssueCreation}
-        enableActivateView={enableActivateView}
-      />
+      {isLoading ? (
+        <div className="flex flex-col w-full p-1 py-2 gap-2">
+          {Array.from({ length: 12 }).map(() => (
+            <Skeleton className="h-8 rounded-sm mx-4" />
+          ))}
+        </div>
+      ) : (
+        <CommandView
+          handleIssueSelection={handleIssueSelection}
+          handleActivateIssueCreation={handleActivateIssueCreation}
+          enableActivateView={enableActivateView}
+        />
+      )}
     </Command>
   );
 }

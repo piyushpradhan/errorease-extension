@@ -12,6 +12,8 @@ import {
 import { axiosInstance } from "./api";
 import { updateLinks } from "./api/link";
 
+import { io } from "socket.io-client";
+
 interface IApp {
   storage: any;
 }
@@ -35,6 +37,15 @@ export default function App({ storage }: IApp) {
       return Promise.reject(error);
     }
   );
+
+  useEffect(() => {
+    if (cookies.length > 0) {
+      const socket = io("http://localhost:3000");
+      socket.on("test", (data) => {
+        console.log("from socket: ", { data });
+      })
+    }
+  }, [cookies]);
 
   useEffect(() => {
     const updateResourceLinks = async () => {
