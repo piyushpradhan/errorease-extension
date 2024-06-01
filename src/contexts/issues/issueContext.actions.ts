@@ -78,3 +78,8 @@ export const setUserAction = (payload: UserAction): IssueReducerActions => ({
   type: atypes.SET_USER_ACTION,
   payload,
 });
+
+export const updateIssuesInRealtime = (payload: Issue[]): IssueReducerActions => ({
+  type: atypes.UPDATE_ISSUES_REALTIME,
+  payload
+});

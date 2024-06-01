@@ -11,6 +11,15 @@ export const issueReducer = (
   const { payload, type }: IssueReducerActions = action;
 
   switch (type) {
+    case atypes.UPDATE_ISSUES_REALTIME:
+      const { issuesById: byId, activeIssue } = getIssuesById(payload);
+
+      return {
+        ...state,
+        issues: payload,
+        issuesById: byId,
+        activeIssue
+      };
     case atypes.SET_USER_ACTION:
       return {
         ...state,

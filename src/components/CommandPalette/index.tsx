@@ -14,9 +14,12 @@ import {
   setSelectedIssue,
   setUserAction,
   updateCreatedIssue,
+  updateIssuesInRealtime,
 } from "@/contexts/issues/issueContext.actions";
 import CommandView from "./CommandView";
 import { Skeleton } from "../ui/skeleton";
+import { io } from "socket.io-client";
+import { BACKEND_URL } from "@/lib/utils";
 
 interface ICommandPalette {
   cookies: string;
@@ -25,6 +28,15 @@ interface ICommandPalette {
 export default function CommandPalette({ cookies }: ICommandPalette) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { issuesState, issuesDispatch } = useIssueContext();
+
+  useEffect(() => {
+    const socket = io(BACKEND_URL);
+
+    // Update the issues
+    socket.on('updated:issues', (data) => {
+      issuesDispatch(updateIssuesInRealtime(data));
+    })
+  }, []);
 
   useEffect(() => {
     if (cookies?.length > 0) {
