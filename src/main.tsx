@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 import IFrame from "@uiw/react-iframe";
 
 import IssueProvider from "@/contexts/issues/IssueContext";
+import LabelProvider from "./contexts/label/LabelContext";
 import App from "./App";
 
 import "./index.css";
@@ -33,7 +34,9 @@ chrome.storage.local
           ]}
         >
           <IssueProvider>
-            <App storage={result} />
+            <LabelProvider>
+              <App storage={result} />
+            </LabelProvider>
           </IssueProvider>
         </IFrame>
       </React.StrictMode>,

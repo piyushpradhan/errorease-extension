@@ -1,5 +1,5 @@
+import { useCallback } from "react";
 import { Link2, Trash } from "lucide-react";
-import { MouseEvent } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,6 +14,9 @@ import useIssueContext from "@/contexts/issues/issueContext.hook";
 import { Link } from "@/types/models";
 import { removeLink, undoAction } from "@/contexts/issues/issueContext.actions";
 import { removeLink as removeLinkApi } from "@/api/link";
+import NewTagBadge from "./NewTagBadge";
+import { removeLabelOptimistic } from "@/contexts/label/labelContext.actions";
+import { removeLabel } from "@/api/label";
 
 export default function IssueDetails() {
   const { issuesState, issuesDispatch } = useIssueContext();
@@ -46,6 +49,12 @@ export default function IssueDetails() {
     }
   }
 
+  const handleRemoveLabel = useCallback(async (labelId: string) => {
+    issuesDispatch(removeLabelOptimistic(selectedIssueId, labelId));
+
+    await removeLabel(selectedIssueId, labelId);
+  }, []);
+
   return (
     <CommandList className="max-h-max">
       <CommandGroup className="p-3">
@@ -57,11 +66,15 @@ export default function IssueDetails() {
           {selectedIssueDetails.labels.map((label) => (
             <Badge
               variant="outline"
-              className="cursor-pointer border border-primary bg-background text-xs"
+              className="cursor-pointer border border-primary bg-background text-xs hover:bg-red-500"
+              onClick={() => {
+                handleRemoveLabel(label.id);
+              }}
             >
               {label.name}
             </Badge>
           ))}
+          <NewTagBadge />
         </div>
       </CommandGroup>
 

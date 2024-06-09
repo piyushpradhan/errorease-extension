@@ -8,7 +8,8 @@ export type UserAction =
   | "searchIssue"
   | "createIssue"
   | "issueDetails"
-  | "activateIssue";
+  | "activateIssue"
+  | "editTags";
 
 export type IIssueContextState = {
   userAction: UserAction;

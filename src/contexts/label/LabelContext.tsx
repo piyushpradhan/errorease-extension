@@ -1,20 +1,17 @@
-import { createContext, ReactNode, useCallback, useEffect, useMemo, useReducer } from "react";
+import { createContext, ReactNode, useMemo, useReducer } from "react";
 
-import { issueReducer } from "./issueContext.reducer";
-import { IssueContextType, IIssueContextState } from "./issueContext.types";
-import { Issue } from "@/types/models";
+import { labelReducer } from "./labelContext.reducer";
+import { LabelContextType, LabelContextState } from "./labelContext.types";
+import { Label } from "@/types/models";
 
-const initialState: IIssueContextState = {
-  userAction: "searchIssue",
-  issues: [],
-  issuesById: new Map<string, Issue>(),
-  selectedIssue: "",
-  activeIssue: null,
+const initialState: LabelContextState = {
+  labels: [],
+  labelsById: new Map<string, Label>(),
 };
 
-export const IssueContext = createContext<IssueContextType>({
-  issuesState: initialState,
-  issuesDispatch: () => { },
+export const LabelContext = createContext<LabelContextType>({
+  labelState: initialState,
+  labelDispatch: () => { },
 });
 
 // To be used later to persist data across tabs
@@ -40,8 +37,8 @@ export const IssueContext = createContext<IssueContextType>({
 // };
 
 
-export default function IssueProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(issueReducer, initialState);
+export default function LabelProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(labelReducer, initialState);
 
   // To be used later to persist data across tabs
   // const saveState = useCallback((state: IIssueContextState) => {
@@ -58,14 +55,14 @@ export default function IssueProvider({ children }: { children: ReactNode }) {
   //   saveState(state);
   // }, [state]);
 
-  const issueContextValues = useMemo(
-    () => ({ issuesState: state, issuesDispatch: dispatch }),
+  const labelContextValues = useMemo(
+    () => ({ labelState: state, labelDispatch: dispatch }),
     [state],
   );
 
   return (
-    <IssueContext.Provider value={issueContextValues}>
+    <LabelContext.Provider value={labelContextValues}>
       {children}
-    </IssueContext.Provider>
+    </LabelContext.Provider>
   );
 }

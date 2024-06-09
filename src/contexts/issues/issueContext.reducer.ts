@@ -213,11 +213,14 @@ export const issueReducer = (
       newIssuesById.set(createdIssue.id, createdIssue);
 
       const newIssues = [...state.issues, createdIssue];
+      const reordered = reorderActiveIssue(newIssues);
+
+      console.log({ newIssues, reordered, newIssuesById });
 
       return {
         ...state,
         issuesById: newIssuesById,
-        issues: reorderActiveIssue(newIssues),
+        issues: reordered,
       };
     case atypes.REMOVE_LINK: {
       const updatedIssueDetails = state.issuesById;
@@ -236,6 +239,88 @@ export const issueReducer = (
         issuesById: updatedIssueDetails
       }
     }
+
+    case atypes.ADD_LABEL_OPTIMISTIC:
+      {
+        const selectedIssue = state.issuesById.get(payload.issueId);
+        if (selectedIssue) {
+          selectedIssue.labels = [...selectedIssue.labels, { id: "temp", "name": payload.label }]
+          const updatedIssues = state.issues.map(issue => {
+            return selectedIssue.id === issue.id ? selectedIssue : issue;
+          });
+          const updatedIssuesById = state.issuesById;
+          updatedIssuesById.set(selectedIssue.id, selectedIssue);
+
+          return {
+            ...state,
+            issues: updatedIssues,
+            issuesById: updatedIssuesById
+          }
+        }
+        return state;
+      }
+    case atypes.ADD_LABEL:
+      {
+        const selectedIssue = state.issuesById.get(payload.issueId);
+        if (selectedIssue) {
+          selectedIssue.labels = selectedIssue.labels.map(label => {
+            if (label.id === "temp") {
+              return payload.label;
+            }
+            return label;
+          });
+
+          const updatedIssues = state.issues.map(issue => {
+            return selectedIssue.id === issue.id ? selectedIssue : issue;
+          });
+          const updatedIssuesById = state.issuesById;
+          updatedIssuesById.set(selectedIssue.id, selectedIssue);
+
+          return {
+            ...state,
+            issues: updatedIssues,
+            issuesById: updatedIssuesById
+          }
+        }
+        return state;
+      }
+    case atypes.REMOVE_LABEL_OPTIMISTIC:
+      {
+        const selectedIssue = state.issuesById.get(payload.issueId);
+        if (selectedIssue) {
+          selectedIssue.labels = selectedIssue.labels.filter(label => label.id !== payload.labelId);
+          const updatedIssues = state.issues.map(issue => {
+            return selectedIssue.id === issue.id ? selectedIssue : issue
+          });
+          const updatedIssuesById = state.issuesById;
+          updatedIssuesById.set(selectedIssue.id, selectedIssue);
+
+          return {
+            ...state,
+            issues: updatedIssues,
+            issuesById: updatedIssuesById
+          }
+        }
+        return state;
+      }
+    case atypes.REMOVE_LABEL:
+      {
+        if (payload.issue) {
+
+          const updatedIssues = state.issues.map(issue => {
+            return payload.issue.id === issue.id ? payload.issue : issue
+          });
+          const updatedIssuesById = state.issuesById;
+          updatedIssuesById.set(payload.issue.id, payload.issue);
+
+          return {
+            ...state,
+            issues: updatedIssues,
+            issuesById: updatedIssuesById
+          }
+        }
+        return state;
+      }
     default:
       return state;
   }

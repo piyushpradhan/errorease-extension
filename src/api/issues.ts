@@ -1,13 +1,9 @@
 import { BACKEND_URL } from "@/lib/utils";
-import axios from "axios";
 import { axiosInstance } from "@/api";
+import { Issue } from "@/types/models";
 
-export async function fetchIssues(token: string) {
-  const response = await axios.get(`${BACKEND_URL}/api/issues`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
+export async function fetchIssues() {
+  const response = await axiosInstance.get(`${BACKEND_URL}/api/issues`);
   return response.data;
 }
 
@@ -28,8 +24,27 @@ export async function deactivateIssue(issueId: string) {
 }
 
 export async function createIssue(title: string) {
-  const response = await axiosInstance.post(`${BACKEND_URL}/api/issues/create`, {
-    title,
-  });
-  return response.data;
+  try {
+    const response = await axiosInstance.post(`${BACKEND_URL}/api/issues/create`, {
+      title,
+    });
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    return { data: null };
+  }
+}
+
+export async function updateIssueLabels(issueId: string, labels: string[]): Promise<{ data: Issue | null }> {
+  try {
+    const response = await axiosInstance.post(`${BACKEND_URL}/api/issues/update`, {
+      id: issueId,
+      labels
+    });
+
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    return { data: null };
+  }
 }
