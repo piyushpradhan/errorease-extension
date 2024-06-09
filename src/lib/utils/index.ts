@@ -1,10 +1,11 @@
 import { IssuesById } from "@/contexts/issues/issueContext.types";
-import { Issue } from "@/types/models";
+import { LabelsById } from "@/contexts/label/labelContext.types";
+import { Issue, Label } from "@/types/models";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 // TODO: Change this to the hosted backend url
-// export const BACKEND_URL = "https://errorease-backend.onrender.com";
+//export const BACKEND_URL = "https://errorease-backend.onrender.com";
 export const BACKEND_URL = "http://localhost:3000";
 
 export const getIssuesById = (
@@ -21,6 +22,17 @@ export const getIssuesById = (
 
   return { issuesById, activeIssue };
 };
+
+export const getLabelsById = (
+  labels: Label[]
+): LabelsById => {
+  const labelsById = new Map<string, Label>();
+  labels.map((label) => {
+    labelsById.set(label.id, label);
+  });
+
+  return labelsById;
+}
 
 export const deactivateOtherIssues = (
   issueId: string,

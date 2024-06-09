@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import { KeyboardEvent, useCallback, useEffect, useState } from "react";
+import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, FilePlus } from "lucide-react";
 
 import { Command, CommandInput } from "@/components/ui/command";
@@ -20,6 +20,9 @@ import CommandView from "./CommandView";
 import { Skeleton } from "../ui/skeleton";
 import { io } from "socket.io-client";
 import { BACKEND_URL } from "@/lib/utils";
+import { fetchAllLabels } from "@/api/label";
+import useLabelContext from "@/contexts/label/labelContext.hook";
+import { populateAllLabels } from "@/contexts/label/labelContext.actions";
 
 interface ICommandPalette {
   cookies: string;
@@ -28,6 +31,7 @@ interface ICommandPalette {
 export default function CommandPalette({ cookies }: ICommandPalette) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { issuesState, issuesDispatch } = useIssueContext();
+  const { labelDispatch } = useLabelContext();
 
   useEffect(() => {
     const socket = io(BACKEND_URL);
@@ -40,9 +44,18 @@ export default function CommandPalette({ cookies }: ICommandPalette) {
 
   useEffect(() => {
     if (cookies?.length > 0) {
+      // Populate issues from backend
+      fetchAllLabels(cookies).then((response) => {
+        labelDispatch(populateAllLabels(response.data || []));
+      })
+    }
+  }, [cookies]);
+
+  useEffect(() => {
+    if (cookies?.length > 0) {
       setIsLoading(true);
       // Populate issues from backend
-      fetchIssues(cookies).then((response) => {
+      fetchIssues().then((response) => {
         issuesDispatch(populateAllIssues(response.data || []));
       }).finally(() => {
         setIsLoading(false);
@@ -55,8 +68,12 @@ export default function CommandPalette({ cookies }: ICommandPalette) {
   const [keyPressed, setKeyPressed] =
     useState<KeyboardEvent<HTMLInputElement>>();
 
+  const commandRef = useRef<HTMLDivElement>(null);
+
   const handleCommand = (event: KeyboardEvent<HTMLInputElement>) => {
-    setKeyPressed(event);
+    if (event.key !== "Backspace") {
+      setKeyPressed(event);
+    }
   };
 
   // Set selected issue
@@ -82,6 +99,9 @@ export default function CommandPalette({ cookies }: ICommandPalette) {
     issuesDispatch(activateIssueView());
     setValue("");
     setKeyPressed(undefined);
+  }, [issuesDispatch]);
+
+  const enableEditTagView = useCallback(() => {
   }, [issuesDispatch]);
 
   useEffect(() => {
@@ -123,7 +143,7 @@ export default function CommandPalette({ cookies }: ICommandPalette) {
       enableActivateView();
     }
 
-    // To activate issue creation using shortcut (Alt + Shift + C)
+    // To activate issue activation using shortcut (Alt + Shift + c;)
     if (
       issuesState?.userAction !== "activateIssue" &&
       keyPressed?.key === "A" &&
@@ -131,6 +151,10 @@ export default function CommandPalette({ cookies }: ICommandPalette) {
       keyPressed?.shiftKey
     ) {
       enableActivateView();
+    }
+
+    if (issuesState?.userAction !== "editTags" && keyPressed?.key === "T" && keyPressed?.altKey && keyPressed?.shiftKey) {
+      enableEditTagView();
     }
   }, [
     issuesState?.userAction,
@@ -142,12 +166,14 @@ export default function CommandPalette({ cookies }: ICommandPalette) {
   ]);
 
   const handleSubmit = async (event: KeyboardEvent) => {
+    if (event.key === "Backspace") {
+      setKeyPressed(event as KeyboardEvent<HTMLInputElement>);
+    }
     if (issuesState.userAction === "createIssue" && event.key === "Enter") {
       // const beforeCreation = issuesState;
       // issuesDispatch(optimisticallyCreateIssue(value));
       try {
-        const response = await createIssue(value);
-        issuesDispatch(updateCreatedIssue(response.data));
+        await createIssue(value);
       } catch (err) {
         console.error(err);
         // issuesDispatch(undoAction(beforeCreation));
@@ -172,11 +198,11 @@ export default function CommandPalette({ cookies }: ICommandPalette) {
 
   return (
     <Command
+      ref={commandRef}
       className="h-[400px] w-[600px] rounded-lg border shadow-md"
       onKeyDown={handleCommand}
     >
       <CommandInput
-        autoFocus={true}
         placeholder={
           issuesState?.userAction === "createIssue"
             ? "Title for your issue"

@@ -3,6 +3,7 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
     const url = tab.url;
     chrome.storage.local.get(["urlList"]).then((result) => {
       const urlList = result.urlList || [];
+      console.log("from background: ", urlList, url);
       if (!urlList.includes(url)) {
         urlList.push(url);
       }

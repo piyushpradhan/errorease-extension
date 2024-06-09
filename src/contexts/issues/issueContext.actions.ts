@@ -5,6 +5,7 @@ import {
   IssueReducerActions,
   UserAction,
 } from "./issueContext.types";
+import { LabelContextState } from "../label/labelContext.types";
 
 export const populateAllIssues = (payload: Issue[]): IssueReducerActions => ({
   type: atypes.GET_ALL_ISSUES,
@@ -42,7 +43,7 @@ export const clearIssue = (): IssueReducerActions => ({
 });
 
 export const undoAction = (
-  payload: IIssueContextState,
+  payload: IIssueContextState | LabelContextState,
 ): IssueReducerActions => ({
   type: atypes.UNDO_ACTION,
   payload,

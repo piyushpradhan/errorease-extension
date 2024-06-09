@@ -26,7 +26,9 @@ const ActivateView = () => {
     issuesDispatch(activateIssue(issueId));
     try {
       await activateIssueApi(issueId);
-      await chrome.storage.local.remove("urlList");
+      await chrome.storage.local.remove("urlList").then((result) => {
+        console.log("Clearing storage: ", { result });
+      });
     } catch (error) {
       issuesDispatch(undoAction(beforeUpdate));
     }
@@ -46,9 +48,11 @@ const ActivateView = () => {
 
   const handleActivationToggle = async (issueId: string) => {
     if (issuesState.issuesById.get(issueId)?.is_active) {
-      handleIssueDeactivation(issueId);
+      await handleIssueDeactivation(issueId);
     } else {
-      handleIssueActivation(issueId);
+      await handleIssueActivation(issueId);
+      const { urlList } = await chrome.storage.local.get(["urlList"]);
+      console.log("Right after activation: ", urlList);
     }
   };
 

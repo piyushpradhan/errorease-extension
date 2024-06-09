@@ -1,3 +1,4 @@
+import * as R from "ramda";
 import { useEffect, useState } from "react";
 import { Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,8 +12,6 @@ import {
 } from "./contexts/issues/issueContext.actions";
 import { axiosInstance } from "./api";
 import { updateLinks } from "./api/link";
-
-import { io } from "socket.io-client";
 
 interface IApp {
   storage: any;
@@ -39,26 +38,21 @@ export default function App({ storage }: IApp) {
   );
 
   useEffect(() => {
-    if (cookies.length > 0) {
-      const socket = io("http://localhost:3000");
-      socket.on("test", (data) => {
-        console.log("from socket: ", { data });
-      })
-    }
-  }, [cookies]);
-
-  useEffect(() => {
     const updateResourceLinks = async () => {
       if (issuesState.activeIssue) {
         const { urlList } = await chrome.storage.local.get(["urlList"]);
+        console.log({ urlList });
         setResourceLinks(urlList);
         const beforeUpdate = issuesState;
         issuesDispatch(optimisticallyUpdateResourceLinks(urlList));
+        let uniqueList: string[] = R.uniq(urlList);
+        uniqueList = uniqueList.filter((link: string) => !link.includes("chrome://") && link.length > 0)
+
         try {
           // activeIssue can't be null here
           const response = await updateLinks(
             issuesState.activeIssue?.id || "",
-            urlList,
+            uniqueList || [],
           );
 
           const updatedIssue = response?.data;
